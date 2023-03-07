@@ -5,10 +5,13 @@ create table tb_log (
     dh date
     );
     
-CREATE OR REPLACE Procedure proc_loop_sleep ( p_who VARCHAR2, p_msg VARCHAR2, p_loops INT, p_sleep INT ) IS
+CREATE OR REPLACE Procedure proc_loop_sleep ( p_who VARCHAR2, p_msg VARCHAR2, p_loops INT, p_sleep INT ) 
+IS
+    v_session NUMBER;
 BEGIN
+    select Sys_Context('USERENV', 'SID') into v_session from dual;
     FOR v_cnt IN 1..p_loops LOOP   
-        insert into tb_log (who, msg, dh) values (p_who, p_msg, sysdate);
+        insert into tb_log (who, msg, dh) values (p_who || ' - DB Session:' || v_session, p_msg, sysdate);
         dbms_session.sleep(p_sleep);
     END LOOP;  
 END;
