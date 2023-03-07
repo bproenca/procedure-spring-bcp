@@ -40,3 +40,31 @@ BEGIN
     PROC_LOOP_SLEEP ( p_who , p_msg , p_loops , p_sleep  );
 END;
 /
+
+
+-----------------------------
+
+CREATE OR REPLACE PACKAGE TEST_PKG IS
+  t_pkg_msg  VARCHAR2(100);
+  t_pkg_date  DATE;
+  PROCEDURE do_something (p_who VARCHAR2, p_msg VARCHAR2, p_sleep INT);
+END TEST_PKG;
+/
+
+CREATE OR REPLACE PACKAGE BODY TEST_PKG IS
+    PROCEDURE do_something (p_who VARCHAR2, p_msg VARCHAR2, p_sleep INT)
+    IS
+        v_session NUMBER;
+    BEGIN
+        select Sys_Context('USERENV', 'SID') into v_session from dual;
+        dbms_session.sleep(p_sleep);
+        insert into tb_log (who, msg, dh) values (p_who || ' - DB Session:' || v_session, 'Before: ' || t_pkg_msg, sysdate);
+        commit;
+        t_pkg_msg := p_msg;
+        insert into tb_log (who, msg, dh) values (p_who || ' - DB Session:' || v_session, 'After: ' || t_pkg_msg, sysdate);        
+        commit;
+    END do_something;
+BEGIN
+  SELECT SYSDATE INTO t_pkg_date FROM DUAL;
+END TEST_PKG;
+/

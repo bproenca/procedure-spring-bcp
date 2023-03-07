@@ -37,7 +37,7 @@ public class TenantRepo {
     @Async
     public void callProc(MyDTO dto) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(multitenantDataSource.getDataSource(dto.getTenant()));
-
+        
         SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName(dto.getProcedure());
         jdbcCall.execute(
             "Thread: " + Thread.currentThread().getName(), //who
@@ -45,7 +45,18 @@ public class TenantRepo {
             dto.getLoops(),
             dto.getSleep());
         
-        log.info("Finished executing procedure with parameters: {}", dto);
+            log.info("Finished executing procedure with parameters: {}", dto);
+        }
+        
+    //Procedure proc_loop_sleep ( p_who VARCHAR2, p_msg VARCHAR2, p_loops INT, p_sleep INT ) 
+    @Async
+    public void callPackage(String tenant, String msg, Integer sleep) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(multitenantDataSource.getDataSource(tenant));
+
+        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate).withProcedureName("DO_SOMETHING").withCatalogName("TEST_PKG");
+        jdbcCall.execute("Thread: " + Thread.currentThread().getName(), msg, sleep);
+        
+        log.info("Finished executing package");
 	}
     
 }
