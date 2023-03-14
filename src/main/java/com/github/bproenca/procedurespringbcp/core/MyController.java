@@ -47,6 +47,12 @@ public class MyController {
         tenantRepo.callProc(body);
     }
 
+    @PostMapping("/package/tenant/{tenant}/msg/{msg}/sleep/{sleep}")
+    public void xpackage(@PathVariable String tenant, @PathVariable String msg, @PathVariable Integer sleep) {
+        log.info(">> [POST] /package/tenants/{}/msg/{}/sleep/{}", tenant, msg, sleep);
+        tenantRepo.callPackage(tenant, msg, sleep);
+    }
+
     @GetMapping("/ping")
     public String ping() {
         log.info(">> [GET] /ping at {}", LocalDateTime.now());
